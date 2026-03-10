@@ -1,0 +1,6 @@
+streamlit
+plotly
+requests
+pdfplumber
+reportlab
+openai
