@@ -1,12 +1,13 @@
 # AI Credit Risk Intelligence Platform
 
+An AI-powered credit risk analysis system that analyzes company financial reports, news sentiment, and risk signals to assist in automated 
+credit decision making.
+
 ## Live Demo
 
 Try the application online:
 
 https://ai-credit-risk-intelligence-z2nrxxwwysypqkhpyrnefg.streamlit.app
-
-An AI-powered credit risk analysis system that analyzes company financial reports, news sentiment, and risk signals to assist in automated credit decision making.
 
 ## Features
 
