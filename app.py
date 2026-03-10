@@ -12,8 +12,20 @@ from backend.cam_generator import generate_cam
 
 st.set_page_config(page_title="AI Credit Risk Intelligence Platform", layout="wide")
 
-st.title("AI Credit Risk Intelligence Platform")
-st.markdown("Analyze company financial health and credit risk using AI.")
+
+# ---------- HEADER ----------
+
+st.markdown(
+"""
+<h1 style='text-align: center; color:#1f4e79;'>
+AI Credit Risk Intelligence Platform
+</h1>
+<p style='text-align: center;'>
+Analyze company financial health and credit risk using AI
+</p>
+""",
+unsafe_allow_html=True
+)
 
 
 # ---------- SIDEBAR ----------
@@ -27,7 +39,13 @@ uploaded_file = st.sidebar.file_uploader("Upload Financial Report (PDF)", type=[
 analyze_button = st.sidebar.button("Run Credit Analysis")
 
 
-# ---------- MAIN PROCESS ----------
+# ---------- DEFAULT MESSAGE ----------
+
+if not analyze_button:
+    st.info("Upload a financial report and click 'Run Credit Analysis'.")
+
+
+# ---------- MAIN ANALYSIS ----------
 
 if analyze_button:
 
@@ -36,21 +54,25 @@ if analyze_button:
         with open("temp_report.pdf", "wb") as f:
             f.write(uploaded_file.read())
 
-        text = extract_text("temp_report.pdf")
 
-        financials = extract_financial_data(text)
+        with st.spinner("Analyzing financial report and risk signals..."):
 
-        ratios = calculate_ratios(financials)
+            text = extract_text("temp_report.pdf")
 
-        news = search_company_news(company)
+            financials = extract_financial_data(text)
 
-        risks = detect_risk_signals(news)
+            ratios = calculate_ratios(financials)
 
-        ai_risk_summary = analyze_news_risk(news)
+            news = search_company_news(company)
 
-        score = credit_score(ratios, risks)
+            risks = detect_risk_signals(news)
 
-        decision = loan_decision(score)
+            ai_risk_summary = analyze_news_risk(news)
+
+            score = credit_score(ratios, risks)
+
+            decision = loan_decision(score)
+
 
         if score >= 80:
             risk_level = "Low Risk"
@@ -59,7 +81,9 @@ if analyze_button:
         else:
             risk_level = "High Risk"
 
+
         generate_cam(company, financials, ratios, risks, score, decision)
+
 
         tab1, tab2, tab3, tab4 = st.tabs([
             "Overview",
@@ -68,7 +92,8 @@ if analyze_button:
             "Credit Decision"
         ])
 
-        # ---------- OVERVIEW ----------
+
+# ---------- OVERVIEW ----------
 
         with tab1:
 
@@ -82,7 +107,7 @@ if analyze_button:
             col4.metric("Credit Score", score)
 
 
-        # ---------- FINANCIAL ANALYSIS ----------
+# ---------- FINANCIAL ANALYSIS ----------
 
         with tab2:
 
@@ -93,6 +118,7 @@ if analyze_button:
             col1.metric("Revenue", f"₹{financials.get('revenue',0):,}")
             col2.metric("Profit", f"₹{financials.get('profit',0):,}")
             col3.metric("Debt", f"₹{financials.get('debt',0):,}")
+
 
             st.divider()
 
@@ -110,6 +136,7 @@ if analyze_button:
                 f"{ratios.get('debt_ratio',0)*100:.2f}%"
             )
 
+
             ratio_names = list(ratios.keys())
             ratio_values = list(ratios.values())
 
@@ -123,7 +150,7 @@ if analyze_button:
             st.plotly_chart(fig)
 
 
-        # ---------- NEWS ----------
+# ---------- NEWS INTELLIGENCE ----------
 
         with tab3:
 
@@ -132,7 +159,6 @@ if analyze_button:
             if news:
                 for n in news:
                     st.info(n)
-
             else:
                 st.write("No recent news found.")
 
@@ -142,9 +168,8 @@ if analyze_button:
             if risks:
                 for r in risks:
                     st.warning(r)
-
             else:
-                st.success("No major risk signals detected")
+                st.success("No major risk signals detected.")
 
 
             st.subheader("AI Risk Analysis")
@@ -152,7 +177,7 @@ if analyze_button:
             st.write(ai_risk_summary)
 
 
-        # ---------- CREDIT DECISION ----------
+# ---------- CREDIT DECISION ----------
 
         with tab4:
 
@@ -174,11 +199,15 @@ if analyze_button:
                 }
             ))
 
-            st.plotly_chart(fig_gauge)
+            col1, col2 = st.columns([2,1])
 
-            st.subheader("Risk Classification")
+            with col1:
+                st.plotly_chart(fig_gauge)
 
-            st.write(risk_level)
+            with col2:
+                st.metric("Score", score)
+                st.metric("Risk Level", risk_level)
+
 
             st.subheader("Loan Decision")
 
@@ -190,6 +219,7 @@ if analyze_button:
 
             else:
                 st.error(decision)
+
 
             st.subheader("Download Credit Appraisal Memo")
 
@@ -204,3 +234,17 @@ if analyze_button:
     else:
 
         st.warning("Please enter company name and upload a PDF.")
+
+
+# ---------- FOOTER ----------
+
+st.markdown("---")
+
+st.markdown(
+"""
+<center>
+AI Credit Risk Intelligence Platform • Built with Streamlit
+</center>
+""",
+unsafe_allow_html=True
+)
